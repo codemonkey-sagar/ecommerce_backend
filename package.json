@@ -2,10 +2,18 @@
   "name": "dukan",
   "version": "1.0.0",
   "description": "E-Commerce Website ",
-  "main": "index.js",
+  "main": "server.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "server": "nodemon ./server/server.js",
+    "start": "node ./server/server.js"
   },
   "author": "code-monkey",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
 }
