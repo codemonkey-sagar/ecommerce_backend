@@ -1,5 +1,7 @@
 import expressAsyncHandler from "express-async-handler";
 import Product from "../models/Product.js";
+import Category from "../models/Category.js";
+import Brand from "../models/Brand.js";
 
 
 // @desc      Create new product
@@ -7,12 +9,26 @@ import Product from "../models/Product.js";
 // @access    Private/admin
 
 export const createProductController = expressAsyncHandler(async (req, res) => {
-  const { name, description, brand, category, sizes, colors, user, price, totalQuantity } = req.body;
+  const { name, description, brand, category, sizes, colors, price, totalQuantity } = req.body;
 
   // Product already Exists 
   const productExists = await Product.findOne({ name });
   if (productExists) {
     throw new Error("Product already Exists");
+  }
+
+  // Find the category 
+  const categoryFound = await Category.findOne({ name: category });
+
+  if (!categoryFound) {
+    throw new Error("Category not found, Please create the category or Check the category name");
+  }
+
+  // Find the brand 
+  const brandFound = await Brand.findOne({ name: brand.toLowerCase() });
+
+  if (!brandFound) {
+    throw new Error("Brand not found, Please create the brand or Check the brand name");
   }
 
   // Create the product 
@@ -29,6 +45,17 @@ export const createProductController = expressAsyncHandler(async (req, res) => {
   });
 
   // Push the product into the Category 
+  categoryFound.products.push(product._id);
+
+  // Resave 
+  await categoryFound.save();
+
+  // Push the product into the Brand 
+  brandFound.products.push(product._id);
+
+  // Resave 
+  await brandFound.save();
+
   res.json({
     status: "Success",
     message: "Product Created Successfully",
